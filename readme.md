@@ -106,7 +106,7 @@
 
 ### ● <a href="grammar/spring/security/SpringSecurity.md">SpringSecurity</a>
 
-### <a href="grammar/spring/security/Security + (JWT & OAuth2).md">Security + (JWT & OAuth2)</a>
+### ● <a href="grammar/spring/security/Security + (JWT & OAuth2).md">Security + (JWT & OAuth2)</a>
 
 ### ● <a href="grammar/spring/security/Security_signin&up.md">Security_signin&up</a>
 
