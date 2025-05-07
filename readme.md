@@ -34,7 +34,7 @@
 
 ### ● <a href="grammar/java/Lambda.md">Lambda Expression</a>
 
-### ● <a href="grammar/java/GenericType.md">GenericType</a>
+### ● <a href="grammar/java/genericType.md">GenericType</a>
 
 ### ● <a href="grammar/java/JVM_stack_heap.md">JVM(Stack/Heap)</a>
 
