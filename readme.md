@@ -146,7 +146,7 @@
 
 ## QueryDSL
 
-### ● <a href="grammar/querydsl/querydsl.md">QueryDSL</a>
+### ● <a href="grammar/querydsl/QueryDSL.md">QueryDSL</a>
 
 ### ● <a href="grammar/querydsl/N+1_fetchJoin.md">N + 1, problem & resolve</a>
 
