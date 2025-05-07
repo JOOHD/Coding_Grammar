@@ -28,13 +28,13 @@
 
 ### ● <a href="grammar/java/stream().md">Stream()</a>
 
-### ● <a href="grammar/java/Static.md">Static variable & method</a>
+### ● <a href="grammar/java/static.md">Static variable & method</a>
 
 ### ● <a href="grammar/java/abstract_interface.md">abstract vs interface</a>
 
 ### ● <a href="grammar/java/Lambda.md">Lambda Expression</a>
 
-### ● <a href="grammar/java/GenericType.md">GenericType</a>
+### ● <a href="grammar/java/genericType.md">GenericType</a>
 
 ### ● <a href="grammar/java/JVM_stack_heap.md">JVM(Stack/Heap)</a>
 
