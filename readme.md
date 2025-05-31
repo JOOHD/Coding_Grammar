@@ -100,7 +100,7 @@
 
 ### ● <a href="grammar/spring/security/refreshToken.md">Refreshtoken</a>
 
-### ● <a href="grammar/spring/security/token_cookie_session">token save Location (cookie vs session)</a>
+### ● <a href="grammar/spring/security/token save Location (cookie vs session)">token save Location (cookie vs session)</a>
 
 ### ● <a href="grammar/spring/security/tokenProvider.md">TokenProvider</a>
 
@@ -126,7 +126,7 @@
 
 ### Secure
 
-### ● <a href="grammar/spring/Secure/SameSite=Strict/None.md">AmazonS3</a>
+### ● <a href="grammar/spring/Secure/SameSite=Strict&None.md">SameSite=Strict&None</a>
 
 ### Amazon3
 
