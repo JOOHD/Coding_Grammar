@@ -124,7 +124,9 @@
 
 ### ● <a href="grammar/spring/security/JWT_implements.md">JWT_implements</a>
 
+### Secure
 
+### ● <a href="grammar/spring/Secure/SameSite=Strict/None.md">AmazonS3</a>
 
 ### Amazon3
 

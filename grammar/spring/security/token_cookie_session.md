@@ -414,10 +414,12 @@
     Authorization: Bearer eyJhbGciOi...
 
     ✅ 쿠키 저장 예시 (보안 설정)
+
     Set-Cookie: refreshToken=ey...; HttpOnly; Secure; SameSite=Strict; Path=/auth
     Set-Cookie: accessToken=ey...; HttpOnly; Secure; SameSite=Strict; Path=/
 
     ✅ 요약 정리
+    
     항목	            내용
     🔐 secretKey	   서버만 알고 있는 키로, Signature 생성/검증에 사용
     📦 JWT 구조	        Header.Payload.Signature (Base64 + HMAC)
