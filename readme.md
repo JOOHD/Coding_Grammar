@@ -124,9 +124,9 @@
 
 ### ● <a href="grammar/spring/security/JWT_implements.md">JWT_implements</a>
 
-### Secure
+### ● <a href="grammar/spring/Security/BlackList.md">BlackList</a>
 
-### ● <a href="grammar/spring/Secure/SameSite=Strict&None.md">SameSite=Strict&None</a>
+### ● <a href="grammar/spring/Security/SameSite=Strict&None.md">SameSite=Strict&None</a>
 
 ### Amazon3
 
