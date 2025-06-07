@@ -106,6 +106,8 @@
 
 ### ● <a href="grammar/spring/security/principalDetails.md">principalDetails</a>
 
+### ● <a href="grammar/spring/security/principal_claims_userdetails.md.">principal vs claims vs userdetails</a>
+
 ### ● <a href="grammar/spring/security/SpringSecurity.md">SpringSecurity</a>
 
 ### ● <a href="grammar/spring/security/Security + (JWT & OAuth2).md">Security + (JWT & OAuth2)</a>
