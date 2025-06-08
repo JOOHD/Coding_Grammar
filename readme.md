@@ -96,6 +96,8 @@
 
 ### Spring Security
 
+### ● <a href="grammar/spring/security/NewShop_JWT+OAuth2.md">My Project NewShop JWT + OAuth2 authentication & authority Sequence</a>
+
 ### ● <a href="grammar/spring/security/accesstoken.md">Accesstoken</a>
 
 ### ● <a href="grammar/spring/security/refreshToken.md">Refreshtoken</a>
