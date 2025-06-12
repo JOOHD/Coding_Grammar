@@ -152,30 +152,51 @@ OncePerRequestFilter 기반 필터로 JwtAuthenticationFilter와 유사. 요청�
 ### 클래스 관계 다이어그램 (간략 관계 + 기능 중심)
 
 [SecurityConfig]
-  ├── JwtAuthenticationFilter / JWTFilterV3 등록
-  │     └─ JWTUtil, TokenResolver 사용
-  ├── OAuth2 로그인 설정
-  │     ├─ CustomOAuth2UserService → 사용자 정보 처리
-  │     └─ CustomAuthenticationSuccessHandler 등록
-  │           └─ JWTUtil, RedisService 사용
-
+  ├── SecurityFilterChain 구성
+  │     ├─ JwtAuthenticationFilter / JWTFilterV3 등록
+  │     │     ├─ JWTUtil: 토큰 생성, 검증, 만료시간 확인 등 JWT 관련 핵심 로직 처리
+  │     │     └─ TokenResolver: HTTP 요청에서 토큰 추출 및 파싱 지원
+  │     ├─ OAuth2 로그인 설정
+  │     │     ├─ CustomOAuth2UserService: OAuth2 공급자(구글 등)로부터 받은 사용자 정보 처리 및 사용자 매핑
+  │     │     └─ CustomAuthenticationSuccessHandler: OAuth2 로그인 성공 후 JWT 토큰 생성 및 Redis에 RefreshToken 저장, 쿠키 설정 담당
+  │     └─ AuthenticationEntryPointV2: 인증 실패 시 401 Unauthorized 응답 처리
+  │
 [JwtAuthenticationFilter or JWTFilterV3]
-  └── JWT 검증 → JWTUtil
-  └── 사용자 정보 추출 → TokenResolver
-
+  ├── doFilterInternal 메서드 내에서
+  │     ├─ TokenResolver로부터 AccessToken 추출
+  │     ├─ JWTUtil로 토큰 유효성 검사 (서명, 만료 시간, 구조 등)
+  │     ├─ RedisService 또는 RedisTemplate로 블랙리스트 여부 체크
+  │     ├─ 블랙리스트에 없으면
+  │     │     └─ JWTUtil 또는 CustomUserDetailsService를 통해 사용자 정보 로드 및 인증 객체 생성
+  │     │     └─ SecurityContext에 인증 정보 저장 (UsernamePasswordAuthenticationToken 등)
+  │     └─ 블랙리스트에 있거나 토큰이 유효하지 않으면 인증 거부 처리
+  │
 [TokenController]
-  └── RefreshToken 유효성 검사 → RedisService
-  └── AccessToken 재생성 → JWTUtil
-
+  ├── RefreshToken 검증 (RedisService 사용)
+  ├── RefreshToken 만료 전 재발급 요청 처리
+  ├── JWTUtil로 AccessToken 재생성
+  └── 클라이언트에게 새로운 AccessToken 반환
+  │
 [CustomOAuth2UserService]
-  └── 구글 사용자 정보 처리 → CustomOAuth2User 반환
-
+  ├── OAuth2UserRequest 기반으로 OAuth2 공급자에서 사용자 정보 요청
+  ├── 사용자 정보를 커스텀 DTO 또는 엔티티(CustomOAuth2User)로 매핑
+  └── 신규 회원이면 DB에 저장하거나 기존 회원과 매핑 처리
+  │
 [CustomAuthenticationSuccessHandler]
-  └── JWT 생성 → JWTUtil
-  └── Redis 저장 및 쿠키 응답 설정 → RedisService
-
+  ├── OAuth2 로그인 성공 시 호출
+  ├── JWTUtil로 AccessToken, RefreshToken 생성
+  ├── RedisService로 RefreshToken Redis 저장 (키: "RT:{userId}")
+  ├── HTTP 응답 쿠키에 AccessToken, RefreshToken 세팅 (HttpOnly, Secure 설정)
+  └── 로그인 후 리다이렉트 또는 응답 전송 처리
+  │
 [AuthenticationEntryPointV2]
-  └── 인증 실패 예외 처리 (401 응답)
-
+  ├── 인증 예외 발생 시 인터셉트
+  ├── 401 Unauthorized 상태 코드 설정
+  ├── JSON 형태로 에러 메시지 응답 전송
+  └── 클라이언트가 인증 실패를 인지하도록 처리
+  │
 [CustomOAuth2User] / [CustomUserDetails]
-  → SecurityContext 에 등록될 인증 사용자 객체 (각 인증 방식에 따라 사용)
+  ├── Spring Security의 UserDetails 또는 OAuth2User 인터페이스 구현체
+  ├── 인증 후 SecurityContextHolder에 등록되어 보안 컨텍스트 유지
+  ├── 사용자 권한(ROLE) 및 식별자(userId, email 등) 포함
+  └── 인증 이후 서비스 계층에서 사용자 정보 접근용으로 활용
