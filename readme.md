@@ -128,11 +128,11 @@
 
 ### ● <a href="grammar/spring/security/JWT_implements.md">JWT_implements</a>
 
-### ● <a href="grammar/spring/Security/BlackList.md">BlackList</a>
+### ● <a href="grammar/spring/security/BlackList.md">BlackList</a>
 
-### ● <a href="grammar/spring/Security/SameSite=Strict&None.md">SameSite=Strict&None</a>
+### ● <a href="grammar/spring/security/SameSite=Strict&None.md">SameSite=Strict&None</a>
 
-### ● <a href="grammar/spring/Security/iamport.md">Iamport</a>
+### ● <a href="grammar/spring/security/iamport.md">Iamport</a>
 
 ### Amazon3
 
