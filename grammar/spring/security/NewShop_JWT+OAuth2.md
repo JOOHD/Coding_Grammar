@@ -200,3 +200,21 @@ OncePerRequestFilter 기반 필터로 JwtAuthenticationFilter와 유사. 요청�
   ├── 인증 후 SecurityContextHolder에 등록되어 보안 컨텍스트 유지
   ├── 사용자 권한(ROLE) 및 식별자(userId, email 등) 포함
   └── 인증 이후 서비스 계층에서 사용자 정보 접근용으로 활용
+
+
+### AuthenticationConfiguration vs AuthenticationManager
+
+1. AuthenticationManager
+- 스프링 시큐리티에서 인증 처리를 담당하는 핵심 인터페이스
+- 로그인 시, 유저가 입력한 id/email , pw 검증해주는 역할
+- 보통 내부적으로 여러 AuthenticationProvider 를 가지고 실제 인증 로직 위임
+
+2. AuthenticationConfiguration
+- 스프링 시큐리티가 내부에서 생성해 놓은 AuthenticationManager 빈을 제공하는 설정 객체입니다.
+- 직접 new AuthenticationManager()를 만들지 않고,
+스프링 컨텍스트에서 관리하는 인증 관련 설정들을 바탕으로 만들어진 AuthenticationManager를 얻는 방법입니다.
+
+-> 스프링 부트 2.0 이상부터는 AuthenticationManager 가 자동으로 생성되지만,
+우리가 커스텀 필터에 주입하려면 직접 빈으로 가져와야 하므로
+AuthenticationConfiguration.getAuthenticationManager() 를 사용한다.
+

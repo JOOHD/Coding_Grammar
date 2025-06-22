@@ -3,15 +3,12 @@
 ### 1. 브라우저 내부 쿠키 저장 구조 
 브라우저는 도메인/경로별로 쿠키를 저장한다. 아래는 Chrome 기준의 쿠키 저장 구조 예시이다.
 
-┌──────────────────────────────────────────┐
-│  브라우저 쿠키 저장소 (Storage)   │
-├────────────┬─────────────┬───────────────┤
-│ Domain │ Path│ Cookies   │
-├────────────┼─────────────┼───────────────┤
-│ localhost  │ /   │ accessToken=abc...; HttpOnly; Secure; SameSite=None │
-│ localhost  │ /   │ refreshToken=xyz...; HttpOnly; Secure; SameSite=None │
-│ example.com│ /user   │ sessionId=123...; SameSite=Strict   │
-└────────────┴─────────────┴───────────────┘
+| Domain      | Path  | Cookies                                         |
+|-------------|-------|------------------------------------------------|
+| localhost   | /     | accessToken=abc...; HttpOnly; Secure; SameSite=None |
+| localhost   | /     | refreshToken=xyz...; HttpOnly; Secure; SameSite=None |
+| example.com | /user | sessionId=123...; SameSite=Strict               |
+
 
 - Domain : 쿠키가 유효한 도메인
 - Path : 쿠키가 유효한 URL 경로
@@ -160,3 +157,28 @@ Secure + SameSite=None = 반드시 HTTPS 환경 필요
 | SameSite=None + Secure=true | ❌  | **HTTPS 필요** – 로컬에선 안 됨   |
 | Secure=true | ❌  | **HTTPS에서만 쿠키 저장** 가능 |
 
+### CSRF & CORS 개념
+
+| 구분       | CSRF (Cross-Site Request Forgery)        | CORS (Cross-Origin Resource Sharing)       |
+| -------- | ---------------------------------------- | ------------------------------------------ |
+| 목적       | 공격자가 사용자의 인증된 상태를 이용해 악의적 요청을 보내는 공격 방어  | 브라우저가 다른 도메인의 자원 접근을 제한하는 보안 정책 해제         |
+| 대상       | 인증된 사용자 세션 (주로 쿠키 인증)                    | 브라우저의 보안 정책 (출처가 다른 도메인 요청)                |
+| 동작 원리    | 서버가 요청이 올바른 출처에서 왔는지 토큰으로 검증             | 서버가 허용한 출처(origin)에만 리소스 공유 허용             |
+| 개발 시 조치  | REST API는 보통 stateless JWT를 써서 CSRF 비활성화 | API 서버에 CORS 설정으로 허용 도메인 및 메서드 지정          |
+| 스프링 설정 예 | `http.csrf().disable()` 또는 특정 경로 제외 설정   | `http.cors().configurationSource(...)`로 설정 |
+
+- 요약
+CSRF: 사용자의 의도하지 않은 요청을 막는 방어막 (주로 세션/쿠키 기반 인증 시 필요)
+
+CORS: 브라우저가 다른 도메인 요청을 제한하는 보안 정책 제어 (주로 API 호출 시 필수)
+
+### CSRF & CORS 역할 및 실제 시나리오
+
+- CORS :
+프론트엔드가 다른 도메인 (ex. localhost:3000)에서 백엔드 API 호출 시, 브라우저 차원에서 거부됨
+  -> 백엔드에서 허용 도메인/헤더/메서드 설정 필요
+
+- CSRF :
+세션 인증 기반 폼 로그인에서, 악성 사이트가 쿠키를 이용해 백엔드에 악의적 요청 보낼 수 있음
+  -> CSRF 토큰 확인으로 방어
+  -> REST API + JWT 방식에서는 보통 비활성화
