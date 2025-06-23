@@ -5,82 +5,60 @@
 [사용자]
    ↓ (1) OAuth2 로그인 요청
 [Frontend] → /oauth2/authorization/google
-   ↓ (2) 구글 인증 성공 → 사용자 정보 반환
+   ↓ (2) 구글 인증 성공 → 인가 코드(code) 반환
 [SecurityConfig → OAuth2LoginFilter]
    ↓ (3) 사용자 정보 로딩
-[CustomOAuth2UserService] → (4) DB 저장/조회 및 CustomOAuth2User 반환
+[CustomOAuth2UserService]
+   ↓ (4) DB 저장/조회 및 CustomOAuth2User 반환
+[CustomOAuth2User]
    ↓
-[OAuth2AuthenticationSuccessHandler]
+[OAuth2AuthenticationSuccessHandler (→ CustomAuthenticationSuccessHandler)]
    ↓ (5) AccessToken + RefreshToken 생성 (JWTUtil)
    ↓ (6) RefreshToken 저장 (RedisService)
-   ↓ (7) AccessToken(HttpOnly 쿠키) 응답에 포함
+   ↓ (7) AccessToken (HttpOnly 쿠키) 응답에 포함
 
 === 이후 요청 흐름 ===
 
 [사용자 → 클라이언트]
    ↓ (1) JWT AccessToken 포함 요청
-[JwtAuthenticationFilter]
+[JWTFilterV3 → JwtAuthenticationFilter]
    ↓ (2) JWT 유효성 검사 (JWTUtil)
-   ↓ (3) 토큰에서 사용자 정보 추출 (TokenResolver)
+   ↓ (3) 사용자 정보 추출 (TokenResolver)
+[CustomUserDetails]
    ↓ (4) SecurityContextHolder 에 인증 객체 저장
    ↓ (5) 인증된 상태로 컨트롤러 로직 실행
 
 [만료 시 → 재발급 요청 /api/token/refresh]
    ↓
-[TokenController → JWTUtil + RedisService] → AccessToken 재발급
+[TokenController]
+   ↓
+[RedisService → JWTUtil] → 새로운 AccessToken 생성 및 응답
 
-### Google OAuth2 인증 & 사용자 정보 요청 흐름 (Authorization Server + Resource Server)
+[AccessToken이 유효하지 않음]
+   ↓
+[AuthenticationEntryPointV2] → 401 Unauthorized 응답 반환
 
-[1] 사용자가 로그인 버튼 클릭
-     ↓
-[2] 클라이언트 → Authorization Server (Google) 요청
-    https://accounts.google.com/o/oauth2/v2/auth
-    ?client_id=...
-    &redirect_uri=...
-    &response_type=code
-    &scope=email profile
+## ✅ 기술 요약
 
-     ↓
-[3] 사용자 Google 계정 로그인 (Authentication)
-     ↓
-[4] 로그인 성공 → Authorization Server → 인가 코드 발급 (code)
-     ↓
-     redirect_uri?code=AUTH_CODE
+| 항목 | 내용 |
+|------|------|
+| 인증 방식 | OAuth2 (Google) → JWT (Access + Refresh) |
+| 인증 필터 | JWTFilterV3, JwtAuthenticationFilter |
+| 사용자 정보 | CustomOAuth2User, CustomUserDetails |
+| 토큰 생성 | JWTUtil |
+| 토큰 저장 | AccessToken (HttpOnly 쿠키), RefreshToken (Redis) |
+| 재발급 로직 | TokenController + RedisService |
+| 예외 처리 | AuthenticationEntryPointV2 |
 
-[5] 클라이언트 서버 → Authorization Server 로 토큰 요청 (인가 코드 사용)
-    POST https://oauth2.googleapis.com/token
-    {
-        code: AUTH_CODE,
-        client_id,
-        client_secret,
-        redirect_uri,
-        grant_type: authorization_code
-    }
+## ✅ 시나리오 요약
 
-     ↓
-[6] Authorization Server → Access Token (+ Refresh Token) 발급
-    {
-      access_token: "...",
-      refresh_token: "...",
-      expires_in: 3600,
-      token_type: "Bearer"
-    }
+1. Google OAuth2 로그인 성공 시 → JWT 발급 후 AccessToken 응답에 쿠키로 전송
+2. 클라이언트는 AccessToken을 쿠키 또는 Authorization 헤더로 전송
+3. JWTFilterV3에서 토큰 검증 → 사용자 인증 → SecurityContext에 등록
+4. 만료 시 RefreshToken으로 `/api/token/refresh` 요청 → 토큰 재발급
+5. AccessToken 유효하지 않으면 `AuthenticationEntryPointV2`에서 에러 응답
 
-[7] 클라이언트 → Resource Server(Google API)에 사용자 정보 요청
-    GET https://www.googleapis.com/oauth2/v3/userinfo
-    Authorization: Bearer {access_token}
-
-     ↓
-[8] Resource Server → 사용자 정보 응답
-    {
-        "sub": "1234567890",
-        "name": "John Doe",
-        "email": "john@example.com",
-        ...
-    }
-
-
-### 클래스별 역할 요약
+### ✅ 클래스별 역할 요약
 
 | 클래스                              | 역할 (한 문장 설명)                                                                           |
 |-----------------------------------|------------------------------------------------------------------------------------------|
@@ -98,7 +76,7 @@
 | `JWTFilterV3`                     | OncePerRequestFilter 로 AccessToken 이 있는 경우 검증하여 인증 처리 (JwtAuthenticationFilter 와 유사 기능) |
 
 
-## 🧩 클래스별 역할 요약 (기능과 관계 중심 정리)
+## ✅ 클래스별 역할 요약 (기능과 관계 중심 정리)
 
 1. SecurityConfig
 
@@ -149,7 +127,7 @@ JWT 기반 인증 시 사용할 UserDetails 구현체. 인증 필터에서 이 �
 OncePerRequestFilter 기반 필터로 JwtAuthenticationFilter와 유사. 요청당 한 번 JWT 검사 수행.
 
 
-### 클래스 관계 다이어그램 (간략 관계 + 기능 중심)
+### ✅ 클래스 관계 다이어그램 (간략 관계 + 기능 중심)
 
 [SecurityConfig]
   ├── SecurityFilterChain 구성
@@ -202,19 +180,4 @@ OncePerRequestFilter 기반 필터로 JwtAuthenticationFilter와 유사. 요청�
   └── 인증 이후 서비스 계층에서 사용자 정보 접근용으로 활용
 
 
-### AuthenticationConfiguration vs AuthenticationManager
-
-1. AuthenticationManager
-- 스프링 시큐리티에서 인증 처리를 담당하는 핵심 인터페이스
-- 로그인 시, 유저가 입력한 id/email , pw 검증해주는 역할
-- 보통 내부적으로 여러 AuthenticationProvider 를 가지고 실제 인증 로직 위임
-
-2. AuthenticationConfiguration
-- 스프링 시큐리티가 내부에서 생성해 놓은 AuthenticationManager 빈을 제공하는 설정 객체입니다.
-- 직접 new AuthenticationManager()를 만들지 않고,
-스프링 컨텍스트에서 관리하는 인증 관련 설정들을 바탕으로 만들어진 AuthenticationManager를 얻는 방법입니다.
-
--> 스프링 부트 2.0 이상부터는 AuthenticationManager 가 자동으로 생성되지만,
-우리가 커스텀 필터에 주입하려면 직접 빈으로 가져와야 하므로
-AuthenticationConfiguration.getAuthenticationManager() 를 사용한다.
 

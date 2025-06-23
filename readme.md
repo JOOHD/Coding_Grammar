@@ -96,19 +96,28 @@
 
 ### Spring Security
 
-### ● <a href="grammar/spring/security/NewShop_JWT+OAuth2.md">My Project NewShop JWT + OAuth2 authentication & authority Sequence</a>
+### ● <a href="grammar/spring/security/NewShop_class_organize.md">My Project NewShop class organized</a>
 
 ### ● <a href="grammar/spring/security/accesstoken.md">Accesstoken</a>
 
 ### ● <a href="grammar/spring/security/refreshToken.md">Refreshtoken</a>
 
+### ● <a href="grammar/spring/security/BlackList.md">BlackList</a>
+
+### ● <a href="grammar/spring/security/SameSite=Strict&None.md">SameSite=Strict&None</a>
+
+### ● <a href="grammar/spring/security/iamport.md">Iamport</a>
+
 ### ● <a href="grammar/spring/security/token save Location (cookie vs session)">token save Location (cookie vs session)</a>
 
 ### ● <a href="grammar/spring/security/tokenProvider.md">TokenProvider</a>
 
+### ● <a href="grammar/spring/security/FormLogin_OAuth2.md">FormLogin & OAuth2Login</a>
+
 ### ● <a href="grammar/spring/security/principalDetails.md">principalDetails</a>
 
 ### ● <a href="grammar/spring/security/principal_claims_userdetails.md.">principal vs claims vs userdetails</a>
+
 
 ### ● <a href="grammar/spring/security/SpringSecurity.md">SpringSecurity</a>
 
@@ -116,23 +125,18 @@
 
 ### ● <a href="grammar/spring/security/Security_signin&up.md">Security_signin&up</a>
 
-### ● <a href="grammar/spring/security/KakaoLogin_OAuth2_JWT_Redis(1).md">KakaoLogin_OAuth2_JWT_Redis(1)</a>
-
-### ● <a href="grammar/spring/security/KakaoLogin_OAuth2_JWT_Redis(2).md">KakaoLogin_OAuth2_JWT_Redis(2)</a>
-
-### ● <a href="grammar/spring/security/KakaoLogin_OAuth2_JWT_Redis(3).md">KakaoLogin_OAuth2_JWT_Redis(3)</a>
-
 ### ● <a href="grammar/spring/security/JWT_Filter.md">JWT_Filter</a>
 
 ### ● <a href="grammar/spring/security/JWT_login.md">JWT_login</a>
 
 ### ● <a href="grammar/spring/security/JWT_implements.md">JWT_implements</a>
 
-### ● <a href="grammar/spring/security/BlackList.md">BlackList</a>
+### ● <a href="grammar/spring/security/KakaoLogin_OAuth2_JWT_Redis(1).md">KakaoLogin_OAuth2_JWT_Redis(1)</a>
 
-### ● <a href="grammar/spring/security/SameSite=Strict&None.md">SameSite=Strict&None</a>
+### ● <a href="grammar/spring/security/KakaoLogin_OAuth2_JWT_Redis(2).md">KakaoLogin_OAuth2_JWT_Redis(2)</a>
 
-### ● <a href="grammar/spring/security/iamport.md">Iamport</a>
+### ● <a href="grammar/spring/security/KakaoLogin_OAuth2_JWT_Redis(3).md">KakaoLogin_OAuth2_JWT_Redis(3)</a>
+
 
 ### Amazon3
 

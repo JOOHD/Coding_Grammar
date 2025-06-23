@@ -57,7 +57,7 @@ UsernamePasswordAuthenticationFilter나 커스텀 LoginFilter가 인증 시도 �
 
 ### 실제 filterChain() 설정
 
-http
+    http
     // CORS, CSRF 설정
     .cors().configurationSource(...)
     .and()
@@ -136,15 +136,17 @@ http.logout(logout -> logout.disable())
   - Refresh Token 제거 (Redis or DB 삭제)
   - Access Token 블랙리스트 등록
 
-- 코드
+- 코드:
+
 public class CustomLogoutFilter extends OncePerReqeustFilter {
+    
     private final JWTUtil jwtUtil;
     private final RedisTemplate<String, String>redisTemplate;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException {
+                                HttpServletResponse response,
+                                FilterChain filterChain) throws ServletException {
 
         String path = request.getRequestURI();
         if (!path.equals("/logout")) {
@@ -165,6 +167,7 @@ public class CustomLogoutFilter extends OncePerReqeustFilter {
         response.getWriter().write("Logout success");
     }
 }
+
 - 핵심 포인트
   - "/logout" 요청만 가로채서 처리.
   - Redis에 저장된 Refresh Token 삭제
@@ -188,7 +191,8 @@ public class CustomLogoutFilter extends OncePerReqeustFilter {
   - 토큰 유효성 검사
   - Redis에 등록된 블랙리스트/Refresh Token 확인
 
-- 코드
+- 코드:
+
 public class JWTFilterV3 extends OncePerRequestFilter {
 
     private final JWTUtil jwtUtil;
@@ -231,6 +235,7 @@ public class JWTFilterV3 extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 }
+
 - 핵심 포인트
   - resolveToken(request) -> 헤더에서 Bearer 토큰 추출
   - validateToken() -> 유효성 및 만료 확인
@@ -249,6 +254,7 @@ public class JWTFilterV3 extends OncePerRequestFilter {
   - Redis에 RefreshToken 저장
 
 - 코드:
+
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
@@ -294,6 +300,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         response.getWriter().write("Login success");
     }
 }
+
 - 핵심 포인트
   - 요청 본문(JSON)에서 사용자 인증 정보 추출
   - AuthenticationManager.authenticate()로 실제 인증 수행
@@ -330,29 +337,29 @@ LoginFilter → 이후 실행되어 로그인 요청을 처리
 
 ### 필터 내부 인증 처리 흐름(Form 로그인 & OAuth2 로그인)
 
-1. 1단계 : 로그인 요청 감지 (/api/login)
+1. 로그인 요청 감지 (/api/login)
 
 - 클라이언트가 POST /api/login 으로 JSON (이메일, 비밀번호) 전송
 - LoginFilter 의 attemptAuthentication() 호출
 
-2. 2단계 : 입력값으로 인증 객체 생성   
+2. 입력값으로 인증 객체 생성   
 
-ObjectMapper mapper = new ObjectMapper();
-LoginRequestDTO loginDTO = mapper.readValue(request.getInputStream(), LoginRequestDTO.class);
+    ObjectMapper mapper = new ObjectMapper();
+    LoginRequestDTO loginDTO = mapper.readValue(request.getInputStream(), LoginRequestDTO.class);
 
-UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-    loginDTO.getEmail(), loginDTO.getPassword()
-);
+    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+        loginDTO.getEmail(), loginDTO.getPassword()
+    );
 
-3. 3단계 : AuthenticationManager 인증 위임
+3. AuthenticationManager 인증 위임
 
-Authentciation authentication = auathenticationManager.authenticate(authToken);
+    Authentciation authentication = auathenticationManager.authenticate(authToken);
 
--> 내부적으로 UserDetailsService 를 통해 사용자 조회
--> 비밀번호 검증 (PasswordEncoder.matches())
--> 성공하면 UsernamPasswordAuthenticationToken 에 인증된 사용자 담김
+    -> 내부적으로 UserDetailsService 를 통해 사용자 조회
+    -> 비밀번호 검증 (PasswordEncoder.matches())
+    -> 성공하면 UsernamPasswordAuthenticationToken 에 인증된 사용자 담김
 
-4. 4단계 : 인증 성공 처리
+4. 인증 성공 처리
 
 successfulAuthentication(...)
 - JWT 생성
@@ -361,23 +368,23 @@ successfulAuthentication(...)
 
 ### OAuth2 로그인 - OAuth2LoginAuthenticationFilter 흐름
 
-1. 1단계 : /oath2/authorization/google 요청
+1. /oath2/authorization/google 요청
 
 - OAuth2 필터가 외부 로그인 페이지 (구글)로 Redirect
 
-2. 2단계 : 사용자 로그인 성공 -> 콜백 /login/oauth2/code/google 도착
+2. 사용자 로그인 성공 -> 콜백 /login/oauth2/code/google 도착
 
 - Authentication Code + Redirect URI로 서버에 다시 도착
 - 필터가 코드로 토큰 교환하고 사용자 정보 요청
 
-3. 3단계 : 사용자 정보 수신 및 가공
+3. 사용자 정보 수신 및 가공
 
 CustomOAuth2UserService.loadUser(OAuth2UserRequest request)
 - 구글 통해서 유저 정보 얻기
 - 유저 DB에 존재하지 않으면, 자동 회원가입 처리
 - 이후, OAuth2User 객체 생성
 
-4. 4단계 : 인증 성공 처리
+4. 인증 성공 처리
 
 OAuth2AuthenticationToken → SecurityContextHolder 저장
 - JWT 발급 또는 세션 설정
@@ -387,19 +394,19 @@ OAuth2AuthenticationToken → SecurityContextHolder 저장
 
 1. 인증 성공 시, JWT 발급 (LoginFilter or OAuth2SuccessHandler 등)
 
-발급 로직 
-String accessToken = jwtUtil.createAccessToken(userId, role);
-String refreshToken = jwtUtil.createRefreshToken(userId);
+    발급 로직 
+    String accessToken = jwtUtil.createAccessToken(userId, role);
+    String refreshToken = jwtUtil.createRefreshToken(userId);
 
-코드 예시
-public String createAccessToken(String userId, String role) {
-    return Jwts.builder()
-    .subject(userId)
-    .claim("role", role)
-    .expiration(new Date(now + accessTokenExpiry))
-    .signWith(secretKey, SignatureAlgorithm.HS256)
-    .compact();
-}
+    코드 예시
+    public String createAccessToken(String userId, String role) {
+        return Jwts.builder()
+        .subject(userId)
+        .claim("role", role)
+        .expiration(new Date(now + accessTokenExpiry))
+        .signWith(secretKey, SignatureAlgorithm.HS256)
+        .compact();
+    }
 
 2. JWT 저장 
 
@@ -454,3 +461,79 @@ public String createAccessToken(String userId, String role) {
 LoginFilter (extends AbstractAuthenticationProcessingFilter)
 JWTFilterV3 (extends OncePerRequestFilter)
 OAuth2LoginAuthenticationFilter (스프링 내장)
+
+### 인증 정보 요약
+
+사용자 -> 클라이언트 -> google authorization -> 사용자 -> 클라이언트 -> google token server -> 사용자 정보 획득
+
+- 요청 파라미터   
+  - client_id (google developer console 발급한 클라이언트 id)
+  - redirect_uri (인증 완료 후 돌아올 uri)
+  - response_type : code (authorization code 요청)
+  - scope (접근 권한 요청 범위, email_profile 등등)
+
+1. 클라이언트 or 백엔드 uri로 google oauth2 인가 요청 보냄
+    GET https://accounts.google.com/o/oauth2/v2/auth
+        ?client_id=abc123.apps.googleusercontent.com
+        &redirect_uri=https://yourapp.com/login/oauth2/code/google
+        &response_type=code
+        &scope=email%profile
+
+2. 사용자 google 로그인
+
+3. 사용자 google 인증에 성공 시, redirect_uri로 authorization code 전달
+    GET https://yourapp.com/login/oauth2/code/google?code=AUTH_CODE
+
+4. 클라이언트는 받은 code를 사용해 accesstoken & refreshtoken 요청
+    POST https://oauth2.googleapis.com/token
+    Content-Type: application/x-www-form-urlencoded
+
+    Request Body (json)
+    {
+        "code": "AUTH_CODE",
+        "client_id": "abc123.apps.googleusercontent.com",
+        "client_secret": "xyz789",
+        "redirect_uri": "https://yourapp.com/login/oauth2/code/google",
+        "grant_type": "authorization_code"
+    }
+
+5. google 토큰 발급
+    Response Body (json)
+    {
+        "access_token": "ya29.A0ARrdaM...",
+        "expires_in": 3599,
+        "refresh_token": "1//0gJ1Kx...",
+        "token_type": "Bearer",
+        "scope": "email profile"
+    } 
+
+6. 클라이언트 -> 사용자 정보 요청    
+    얻은 access_token을 사용하여 Resource Server(Google API)로 사용자 정보를 요청합니다:
+
+    GET https://www.googleapis.com/oauth2/v3/userinfo
+    Authorization: Bearer {access_token}
+
+7. Google → 사용자 정보 반환
+    아래 정보를 통해 사용자의 이메일/이름 등을 확인하여 DB 등록 또는 기존 사용자와 연결
+    {
+        "sub": "1234567890",
+        "name": "John Doe",
+        "email": "john@example.com",
+        "picture": "https://example.com/photo.jpg"
+    }
+
+### 1 ~7 흐름 Spring Security 
+
+| 단계   | 스프링 처리 주체                                             |
+| ---- | ----------------------------------------------------- |
+| 1\~3 | Spring Security 내부 `OAuth2LoginAuthenticationFilter`  |
+| 4\~5 | `CustomOAuth2UserService` 가 사용자 정보 처리                 |
+| 6\~7 | `CustomAuthenticationSuccessHandler` 가 JWT 발급 & 응답 처리 |
+
+### 보안 팁
+
+- state 파라미터를 통해 CSRF 방지 필수
+- 토큰 저장 시 HttpOnly + Secure 쿠키 권장
+- RefreshToken은 Redis 또는 DB 등 서버 측 저장소에 안전하게 저장
+- 토큰 만료 및 재발급 전략 명확히 정의 필요
+
