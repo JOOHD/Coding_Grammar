@@ -112,18 +112,19 @@
 
 ### ● <a href="grammar/spring/security/tokenProvider.md">TokenProvider</a>
 
-### ● <a href="grammar/spring/security/FormLogin_OAuth2.md">FormLogin & OAuth2Login</a>
+### ● <a href="grammar/spring/security/authenticationManager.md">AuthenticationManager</a>
 
 ### ● <a href="grammar/spring/security/principalDetails.md">principalDetails</a>
 
 ### ● <a href="grammar/spring/security/principal_claims_userdetails.md.">principal vs claims vs userdetails</a>
-
 
 ### ● <a href="grammar/spring/security/SpringSecurity.md">SpringSecurity</a>
 
 ### ● <a href="grammar/spring/security/Security + (JWT & OAuth2).md">Security + (JWT & OAuth2)</a>
 
 ### ● <a href="grammar/spring/security/Security_signin&up.md">Security_signin&up</a>
+
+### ● <a href="grammar/spring/security/FormLogin_OAuth2Login.md">FormLogin & OAuth2Login</a>
 
 ### ● <a href="grammar/spring/security/JWT_Filter.md">JWT_Filter</a>
 
